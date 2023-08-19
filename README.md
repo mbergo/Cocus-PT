@@ -1,81 +1,81 @@
-# EC2 Inspector Lambda
 
-A Python-based AWS Lambda function to inspect EC2 instances using Boto3.
+# EC2 Instances Explorer - Cocus PT
 
-## Project Structure:
+Hello! I'm *Marcus Bergo* applying for Cocus PT, and I've embarked on this  challenge of creating a project that can fetch and list EC2 instances based on a search criterion via an AWS Lambda function.
+
+## Repository Structure
 
 ```
-├── lambda_function
-│   ├── main.py
-│   └── requirements.txt
+├── main.py
 ├── Makefile
+├── output_example.txt
+├── problems-and-solutions.md
 ├── README.md
-└── terraform
-    ├── main.tf
-    ├── backend.tf
-    ├── lambda.zip
-    └── variables.tf
+├── requirements.txt
+├── scripts
+│   └── create-attach-policy.sh
+├── terraform
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── output.tf
+│   ├── policy.json
+│   ├── terraform-no-iam
+│   │   ├── lambda_function_payload.zip
+│   │   ├── main-no-iam.tf
+│   │   ├── main.py
+│   │   ├── outputs-no-iam.tf
+│   │   └── variables-no-iam.tf
+│   ├── trust_policy.json
+│   └── variables.tf
+└── tests
+    └── test_main.py
 ```
 
-## Setup and Deployment:
+## The Journey of "terraform-no-iam"
 
-### AWS Credentials:
+In the course of this challenge, I hit some roadblocks, primarily due to permission restrictions when attempting to orchestrate certain AWS IAM roles and policies through Terraform. To circumvent these permission errors, I forged the "terraform-no-iam" directory. It's essentially a variant of the Terraform configurations that avoids direct IAM operations but still achieves the desired functionality.
 
-Before you begin, make sure you've set your AWS credentials as environment variables. You can do this by executing the following:
+## Setting Things Up
 
-```bash
-export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
-```
+1. **Dependencies First!**
+   To start, you'd want to install the required Python libraries. Here's how I do it:
 
-Replace `YOUR_ACCESS_KEY` and `YOUR_SECRET_KEY` with your actual credentials. This ensures your credentials are not hardcoded anywhere in the project.
+   ```
+   make setup
+   ```
 
-1. **Install Required Python Packages**:
+2. **Let's Package the Lambda Payload**
+   This will neatly zip the `main.py` from our root directory and tuck the zipped payload into the `terraform-no-iam` directory. This is primed for Terraform to take over.
 
-```bash
-make install
-```
+   ```
+   make create-zip
+   ```
 
-2. **Run the Script Locally**:
+3. **Unleashing Terraform**
+   Time to apply the Terraform configurations. Here's how I go about it:
 
-```bash
-make run
-```
+   ```
+   make apply-terraform
+   ```
 
-3. **Package the Lambda Function**:
+4. **Quality Assurance with Tests**
+   It's always good to double-check. I run the unit tests to ensure everything's ticking as expected and as good manners :):
 
-```bash
-make package
-```
+   ```
+   make test
+   ```
 
-4. **Install the Specified Terraform Version**:
+5. **Clean-Up Time**
+   If there's ever a need to dismantle the AWS resources created by Terraform, here's what I use:
 
-```bash
-make install_terraform
-```
+   ```
+   make destroy-terraform
+   ```
 
-5. **Initialize the Terraform Workspace**:
+## Collaboration
 
-```bash
-make init
-```
+Always open to fresh ideas and perspectives! Feel free to raise pull requests. Just a small ask: please ensure to update or add tests as appropriate.
 
-6. **Apply the Terraform Configuration**:
+## Licensing
 
-This will deploy the Lambda function:
-
-```bash
-make apply
-```
-
-7. **Destroy the Created Resources**:
-
-```bash
-make destroy
-```
-
-## State Management with S3:
-
-This setup uses AWS S3 to store the Terraform state file. Ensure you've set up an S3 bucket and specified its name in `backend.tf`.
-
-Remember to never commit sensitive information like AWS credentials. Always use environment variables or other secure methods.
+Under the [MIT](https://spdx.org/licenses/MIT.html) license.

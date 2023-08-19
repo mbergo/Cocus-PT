@@ -1,2 +1,3 @@
-boto3==1.18.21
-prettytable==2.2.0
+boto3==1.17.112  # AWS SDK for Python
+prettytable==2.1.0  # To display data in table format
+mock==4.0.3  # Used for mocking in unit tests (for Python versions < 3.8)

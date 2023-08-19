@@ -1,0 +1,20 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "iam:CreateRole",
+                "iam:CreatePolicy",
+                "iam:AttachRolePolicy",
+                "lambda:CreateFunction"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Action": "sts:AssumeRole",
+            "Effect": "Allow",
+            "Resource": "arn:aws:iam::115189082206:role/platform-test*"
+        }
+    ]
+}
