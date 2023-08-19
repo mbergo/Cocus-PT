@@ -1,81 +1,72 @@
-# EC2 Inspector Lambda
+# EC2 Instances Fetcher
 
-A Python-based AWS Lambda function to inspect EC2 instances using Boto3.
+Hello! I'm Marcus Bergo applying for Cocus PT. I embarked on a challenge to create an AWS Lambda function that fetches EC2 instance details and presents them in a tabular format.
 
-## Project Structure:
+## Project Structure
 
 ```
-├── lambda_function
-│   ├── main.py
-│   └── requirements.txt
+├── main.py
 ├── Makefile
+├── output_example.txt
+├── problems-and-solutions.md
 ├── README.md
-└── terraform
-    ├── main.tf
-    ├── backend.tf
-    ├── lambda.zip
-    └── variables.tf
+├── requirements.txt
+├── scripts
+│   └── create-attach-policy.sh
+├── terraform
+│   ├── backend.tf
+│   ├── main.tf
+│   ├── output.tf
+│   ├── policy.json
+│   ├── terraform-no-iam
+│   │   ├── lambda_function_payload.zip
+│   │   ├── main-no-iam.tf
+│   │   ├── outputs-no-iam.tf
+│   │   └── variables-no-iam.tf
+│   ├── trust_policy.json
+│   └── variables.tf
+└── tests
+    └── test_main.py
 ```
 
-## Setup and Deployment:
+## Introduction
 
-### AWS Credentials:
+This project is designed to list EC2 instances with some key details. The main logic is encapsulated in `main.py`. However, I wanted to leverage AWS Lambda to make this available as a serverless function. Unfortunately, I encountered several permissions challenges during deployment which are detailed below.
 
-Before you begin, make sure you've set your AWS credentials as environment variables. You can do this by executing the following:
+## Permissions Challenges & Considerations
 
-```bash
-export AWS_ACCESS_KEY_ID=YOUR_ACCESS_KEY
-export AWS_SECRET_ACCESS_KEY=YOUR_SECRET_KEY
-```
+During the deployment phase, I faced significant IAM permission constraints, which prevented me from deploying the Lambda function via Terraform. The user `svc.115189082206.tda.cocustest` lacked the necessary permissions to perform specific IAM-related operations like creating a policy and attaching it.
 
-Replace `YOUR_ACCESS_KEY` and `YOUR_SECRET_KEY` with your actual credentials. This ensures your credentials are not hardcoded anywhere in the project.
+If you're using this codebase in an AWS environment with strict IAM policies or permissions boundaries, be cautious.
 
-1. **Install Required Python Packages**:
+Specifically, I ran into issues with the `iam:CreatePolicy` permission when trying to create a new IAM policy. If you encounter a similar issue, you'll either need elevated permissions or the assistance of an AWS administrator.
 
-```bash
-make install
-```
+## Why `terraform-no-iam`?
 
-2. **Run the Script Locally**:
+You might notice there's a folder named `terraform-no-iam`. Due to the permissions constraints, I decided to separate the Terraform configuration that doesn't require any IAM-related actions. This is to ensure that other parts of the infrastructure can still be provisioned even if the IAM part fails due to permissions issues. Even though, I got in trouble with permissions again. Please see [problems-and-solutions](problems-and-solutions.md)
 
-```bash
-make run
-```
+## How to Use
 
-3. **Package the Lambda Function**:
+1. **Local Execution**: Navigate to the project's root directory and run:
 
-```bash
-make package
-```
+    ```bash
+    python main.py [SEARCH_KEYWORD]
+    ```
 
-4. **Install the Specified Terraform Version**:
+2. **Lambda Deployment**: This might be challenging without the correct permissions. But in a suitable environment, navigate to the `terraform-no-iam` directory and execute:
 
-```bash
-make install_terraform
-```
+    ```bash
+    terraform init
+    terraform apply
+    ```
 
-5. **Initialize the Terraform Workspace**:
+3. **Unit Tests**: Navigate to the `tests` directory and run:
 
-```bash
-make init
-```
+    ```bash
+    python -m unittest test_main.py
+    ```
 
-6. **Apply the Terraform Configuration**:
+## Closing Thoughts
 
-This will deploy the Lambda function:
+This project was pretty cool, especially understanding the nuances of AWS IAM. If you're planning to use or adapt this codebase, always remember to verify your IAM permissions and ensure you're adhering to the principle of least privilege.
 
-```bash
-make apply
-```
-
-7. **Destroy the Created Resources**:
-
-```bash
-make destroy
-```
-
-## State Management with S3:
-
-This setup uses AWS S3 to store the Terraform state file. Ensure you've set up an S3 bucket and specified its name in `backend.tf`.
-
-Remember to never commit sensitive information like AWS credentials. Always use environment variables or other secure methods.

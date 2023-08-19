@@ -1,33 +1,18 @@
-TERRAFORM_VERSION=1.0.3
+# This Makefile streamlines various tasks for the project.
 
-install:
-	pip install -r lambda_function/requirements.txt
+setup:
+	pip3 install -r requirements.txt
 
 test:
-    python -m unittest test_main.py
+	python3 -m unittest tests/test_main.py
 
-run:
-	python lambda_function/main.py
+create-zip:
+	zip terraform/terraform-no-iam/lambda_function_payload.zip main.py
 
-package:
-	cd lambda_function && zip -r ../terraform/lambda.zip .
+apply-terraform:
+	cd terraform && terraform init && terraform apply
 
-init:
-	cd terraform && terraform init
+destroy-terraform:
+	cd terraform && terraform destroy
 
-plan:
-	cd terraform && terraform plan
-
-apply:
-	cd terraform && terraform apply -auto-approve
-
-destroy:
-	cd terraform && terraform destroy -auto-approve
-
-install_terraform:
-	curl -LO "https://releases.hashicorp.com/terraform/$(TERRAFORM_VERSION)/terraform_$(TERRAFORM_VERSION)_linux_amd64.zip"
-	unzip terraform_$(TERRAFORM_VERSION)_linux_amd64.zip
-	mv terraform /usr/local/bin/
-	rm terraform_$(TERRAFORM_VERSION)_linux_amd64.zip
-
-.PHONY: install run package init plan apply destroy install_terraform
+.PHONY: setup test create-zip apply-terraform destroy-terraform
