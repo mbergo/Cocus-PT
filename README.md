@@ -1,9 +1,8 @@
+# EC2 Instances Fetcher
 
-# EC2 Instances Explorer - Cocus PT
+Hello! I'm Marcus Bergo applying for Cocus PT. I embarked on a challenge to create an AWS Lambda function that fetches EC2 instance details and presents them in a tabular format.
 
-Hello! I'm *Marcus Bergo* applying for Cocus PT, and I've embarked on this  challenge of creating a project that can fetch and list EC2 instances based on a search criterion via an AWS Lambda function.
-
-## Repository Structure
+## Project Structure
 
 ```
 ├── main.py
@@ -22,7 +21,6 @@ Hello! I'm *Marcus Bergo* applying for Cocus PT, and I've embarked on this  chal
 │   ├── terraform-no-iam
 │   │   ├── lambda_function_payload.zip
 │   │   ├── main-no-iam.tf
-│   │   ├── main.py
 │   │   ├── outputs-no-iam.tf
 │   │   └── variables-no-iam.tf
 │   ├── trust_policy.json
@@ -31,51 +29,44 @@ Hello! I'm *Marcus Bergo* applying for Cocus PT, and I've embarked on this  chal
     └── test_main.py
 ```
 
-## The Journey of "terraform-no-iam"
+## Introduction
 
-In the course of this challenge, I hit some roadblocks, primarily due to permission restrictions when attempting to orchestrate certain AWS IAM roles and policies through Terraform. To circumvent these permission errors, I forged the "terraform-no-iam" directory. It's essentially a variant of the Terraform configurations that avoids direct IAM operations but still achieves the desired functionality.
+This project is designed to list EC2 instances with some key details. The main logic is encapsulated in `main.py`. However, I wanted to leverage AWS Lambda to make this available as a serverless function. Unfortunately, I encountered several permissions challenges during deployment which are detailed below.
 
-## Setting Things Up
+## Permissions Challenges & Considerations
 
-1. **Dependencies First!**
-   To start, you'd want to install the required Python libraries. Here's how I do it:
+During the deployment phase, I faced significant IAM permission constraints, which prevented me from deploying the Lambda function via Terraform. The user `svc.115189082206.tda.cocustest` lacked the necessary permissions to perform specific IAM-related operations like creating a policy and attaching it.
 
-   ```
-   make setup
-   ```
+If you're using this codebase in an AWS environment with strict IAM policies or permissions boundaries, be cautious.
 
-2. **Let's Package the Lambda Payload**
-   This will neatly zip the `main.py` from our root directory and tuck the zipped payload into the `terraform-no-iam` directory. This is primed for Terraform to take over.
+Specifically, I ran into issues with the `iam:CreatePolicy` permission when trying to create a new IAM policy. If you encounter a similar issue, you'll either need elevated permissions or the assistance of an AWS administrator.
 
-   ```
-   make create-zip
-   ```
+## Why `terraform-no-iam`?
 
-3. **Unleashing Terraform**
-   Time to apply the Terraform configurations. Here's how I go about it:
+You might notice there's a folder named `terraform-no-iam`. Due to the permissions constraints, I decided to separate the Terraform configuration that doesn't require any IAM-related actions. This is to ensure that other parts of the infrastructure can still be provisioned even if the IAM part fails due to permissions issues. Even though, I got in trouble with permissions again. Please see [problems-and-solutions](problems-and-solutions.md)
 
-   ```
-   make apply-terraform
-   ```
+## How to Use
 
-4. **Quality Assurance with Tests**
-   It's always good to double-check. I run the unit tests to ensure everything's ticking as expected and as good manners :):
+1. **Local Execution**: Navigate to the project's root directory and run:
 
-   ```
-   make test
-   ```
+    ```bash
+    python main.py [SEARCH_KEYWORD]
+    ```
 
-5. **Clean-Up Time**
-   If there's ever a need to dismantle the AWS resources created by Terraform, here's what I use:
+2. **Lambda Deployment**: This might be challenging without the correct permissions. But in a suitable environment, navigate to the `terraform-no-iam` directory and execute:
 
-   ```
-   make destroy-terraform
-   ```
+    ```bash
+    terraform init
+    terraform apply
+    ```
 
-## Collaboration
+3. **Unit Tests**: Navigate to the `tests` directory and run:
 
-Always open to fresh ideas and perspectives! Feel free to raise pull requests. Just a small ask: please ensure to update or add tests as appropriate.
+    ```bash
+    python -m unittest test_main.py
+    ```
 
-## Licensing
+## Closing Thoughts
 
-Under the [MIT](https://spdx.org/licenses/MIT.html) license.
+This project was pretty cool, especially understanding the nuances of AWS IAM. If you're planning to use or adapt this codebase, always remember to verify your IAM permissions and ensure you're adhering to the principle of least privilege.
+
